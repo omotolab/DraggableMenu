@@ -10,7 +10,8 @@
 		content="draggable, menu, navigation, thumbnails, grid, javascript, gsap, web design, layout" />
 	<meta name="author" content="Codrops" />
 	<link rel="shortcut icon" href="favicon.ico">
-	<link rel="stylesheet" href="https://use.typekit.net/crf4rue.css">
+
+
 	<link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,134 +43,310 @@
 	<script>document.documentElement.className = "js"; var supportsCssVars = function () { var e, t = document.createElement("style"); return t.innerHTML = "root: { --tmp-var: bold; }", document.head.appendChild(t), e = !!(window.CSS && window.CSS.supports && window.CSS.supports("font-weight", "var(--tmp-var)")), t.parentNode.removeChild(t), e }; supportsCssVars() || alert("Please view this demo in a modern browser that supports CSS Variables.");</script>
 </head>
 
-<body id="app" class="loading uk-flex uk-flex-row-reverse uk-grid uk-grid-collapse">
+<body class="loading ">
 
-	<aside class="uk-width-medium uk-card-default uk-card-small uk-visible@s" style="z-index: 1000">
-		<div class="uk-card-header ">
-			<div class="uk-flex uk-flex-between">
-				<div>Design Board</div>
-				<div>{{ current }}</div>
-				<div>{{ pointer + 1 }}</div>
+
+	<div id="app" class="uk-flex uk-flex-row-reverse uk-grid uk-grid-collapse">
+		<aside class="uk-width-medium uk-card-default uk-card-small uk-visible@s" style="z-index: 1000">
+			<div class="uk-card-header ">
+				<div class="uk-flex uk-flex-between">
+					<div>{{ title }}</div>
+
+					<!-- <div>
+						<button class="uk-button uk-button-small" @click="saveToSupabase()">Save</button>
+					</div> -->
+
+				</div>
+
 			</div>
+			<div class="">
+				<ul class="uk-margin-remove" uk-accordion uk-sortable @stop="handleMove" :key="`list-${version}`">
+					<li v-for="(chapter, c) in chapters" :key="c" :id="c" class="uk-card-header uk-margin-remove"
+						@click="setCurrentChapter(chapter.title)">
+						<a class="uk-accordion-title" href="#">
+							<strong v-if="current === chapter.title">{{ chapter.title }}</strong>
+							<span v-else>{{ chapter.title }}</span>
+						</a>
+						<div class="uk-accordion-content">
+							<ul class="uk-iconnav" uk-sortable>
+								<li v-for="(item, i) in chapter.items">
+									<div class="uk-margin-small-bottom" @click="handleItem(item, i)">
+										<template v-if="item.type !== 'iframe'">
+											<div class="uk-margin-small-bottom">
+												<div class="uk-icon-button uk-border-rounded uk-icon uk-icon-image"
+													:style="`background-image: url(${item.data.img}); background-size: cover`">
+												</div>
+											</div>
+										</template>
+										<template v-else>
+											<span uk-icon="file-text" class="uk-icon-button uk-border-rounded "></span>
+										</template>
+										<div class="uk-text-meta">#{{ item.type }}</div>
+									</div>
+								</li>
+								<li>
+									<div href="#modal-center" uk-toggle
+										class="uk-icon-button uk-border-rounded uk-margin-small-bottom">
+										<div uk-icon="plus"></div>
+									</div>
+									<div id="modal-center" class="uk-flex-top" uk-modal="bg-close: false">
 
-		</div>
-		<div class="">
-			<ul class="uk-margin-remove" uk-accordion uk-sortable @stop="handleMove" :key="`list-${version}`">
-				<li v-for="(chapter, c) in chapters" :key="c" :id="c" class="uk-card-header uk-margin-remove">
-					<a class="uk-accordion-title" href="#">
-						<strong v-if="current === chapter.title">{{ chapter.title }}</strong>
-						<span v-else>{{ chapter.title }}</span>
-					</a>
-					<div class="uk-accordion-content">
-						<ul class="uk-iconnav" uk-sortable>
-							<li v-for="(item, i) in chapter.items">
-								<div class="uk-icon-button uk-border-rounded">{{ item }}</div>
-							</li>
-						</ul>
+
+										<div
+											class="uk-modal-dialog uk-margin-auto-vertical uk-border-rounded uk-card uk-card-small">
+
+											<div class="uk-card-header">
+												<div class="uk-flex uk-flex-between">
+													<div>{{ chapter.title }}</div>
+													<button class="uk-modal-close" type="button" uk-close></button>
+												</div>
+
+											</div>
+											<div class="uk-overflow-auto uk-card-body uk-padding-remove-vertical"
+												uk-slider>
+												<div class="uk-position-relative">
+													<div class="uk-slider-container">
+														<ul class="uk-slider-items uk-grid uk-grid-small">
+															<li v-for="(item, i) in chapter.items"
+																@click="setCurrentImage({ item, id: i })">
+																<template v-if="!item.data.uri">
+
+																	<img :src="item.data.img" class="uk-height-medium">
+
+																</template>
+																<template v-else>
+																	new
+																	<img :src="item.data.uri" class="uk-height-medium">
+
+																</template>
+															</li>
+														</ul>
+													</div>
+													<a class="uk-position-center-left-out" href="#"
+														uk-slider-item="previous" uk-icon="chevron-left"></a>
+													<a class="uk-position-center-right-out" href="#"
+														uk-slider-item="next" uk-icon="chevron-right"></a>
+
+												</div>
+												<!-- <ul class="uk-thumbnav" uk-margin >
+													<li v-for="(item, i) in chapter.items" :uk-slider-item="i">
+														<a href="#"><img :src="item.data.img" width="100" height="67" alt=""></a>
+													</li>
+												</ul> -->
+
+
+
+
+											</div>
+											<div class="uk-card-footer">
+
+												<template v-if="selected">
+													<!-- <div>
+														<div class="uk-text-center uk-padding-small">
+															<span uk-icon="icon: file-edit"></span>
+															<div>Edit your link</div>
+														</div>
+													</div> -->
+													<div class="uk-inline uk-width-1-1 uk-flex uk-flex-middle ">
+														<span class="uk-form-icon"
+															:uk-icon="`${selected.type === 'video' ? 'video-camera' : selected.type }`"></span>
+
+														<a class="uk-form-icon uk-form-icon-flip"
+															@click="updateItem(selected)">
+															<span class="" uk-icon="check"></span>
+														</a>
+
+														<input class="uk-input  uk-margin-remove"
+															:value="selected.data.src" @input="(i) => updateSelected({
+															text: i.target.value,
+															selected
+														})" placeholder="Enter your target link here." />
+													</div>
+												</template>
+												<template v-else>
+													<div>
+														<!-- <div class="uk-text-center uk-padding-small">
+															<span uk-icon="icon: cloud-upload"></span>
+															<div>Add an image</div>
+														</div> -->
+														<div uk-form-custom class="uk-width-expand ">
+															<div
+																class="js-upload uk-placeholder uk-input uk-text-center uk-flex uk-flex-center uk-flex-middle uk-cursor-pointer">
+																<input type="file" multiple>
+																<span class="uk-text-middle">To start, drop some images
+																	here
+																	or
+																	click this placeholder. </span>
+															</div>
+														</div>
+														<progress id="js-progressbar" class="uk-progress" value="0"
+															max="100" hidden></progress>
+													</div>
+												</template>
+
+											</div>
+
+
+
+
+
+
+
+											<div v-if="false">
+												<ul class="uk-flex uk-flex-between uk-iconnav" uk-switcher>
+													<li>
+														<ul class="uk-iconnav " uk-sortable>
+															<li v-for="(item, i) in chapter.items">
+																<div class="uk-margin-small-bottom">
+																	<template v-if="item.type !== 'iframe'">
+																		<div class="uk-margin-small-bottom">
+																			<div class="uk-icon-button uk-border-rounded uk-icon uk-icon-image"
+																				:style="`background-image: url(${item.data.img}); background-size: cover`">
+																			</div>
+																		</div>
+																	</template>
+																	<template v-else>
+																		<span uk-icon="file-text"
+																			class="uk-icon-button uk-border-rounded "></span>
+																	</template>
+																	<div class="uk-text-meta">#{{ item.type }}</div>
+																</div>
+															</li>
+														</ul>
+													</li>
+													<li>
+														<ul class="uk-iconnav ">
+															<li>
+																<div
+																	class="uk-icon-button uk-border-rounded uk-margin-small-bottom">
+																	<div uk-icon="plus"></div>
+																</div>
+
+															</li>
+														</ul>
+													</li>
+												</ul>
+												<ul class="uk-iconnav">
+													<li>
+														<ul>
+															<li v-for="(item, i) in chapter.items"></li>
+														</ul>
+													</li>
+												</ul>
+											</div>
+
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</li>
+
+				</ul>
+			</div>
+		</aside>
+
+		<main class="uk-width-expand">
+			<!-- <div class="frame">
+				<div class="frame__pagetitle">Draggable Menu with Grid Previews</div>
+				<div class="frame__title-wrap">
+					<h1 class="frame__title">Yuri Shevchenko</h1>
+					<p class="frame__tagline">2008 &mdash; 2019</a></p>
+				</div>
+				<div class="frame__links">
+					<a href="https://tympanus.net/Development/DraggableImageStrip/">Previous Demo</a>
+					<a href="https://tympanus.net/codrops/?p=40926">Article</a>
+					<a href="https://github.com/codrops/DraggableMenu/">GitHub</a>
+				</div>
+				<div class="frame__social">
+					<a href="#" aria-label="Link to Yuri's Behance profile"><img src="img/behance.svg"
+							class="frame__social-behance" alt="Behance Logo" /></a>
+				</div>
+			</div> -->
+
+			<div class="page page--preview">
+				<div class="grid-wrap">
+					<div v-for="(chapter, c) in chapters" :class="`grid grid--layout-${c+1}`" :key="c" :id="c"
+						:key="`flow-${version}`" uk-lightbox>
+
+						<a v-for="(item, i) in chapter.items" :href="`${item.data.src}`" :key="`${c}${i}`"
+							class="grid__item-wrap" :data-alt="item.type">
+
+							<template v-if="item.type !== 'iframe'">
+								<template v-if="item.type === 'image' ">
+									<div class="grid__item" :style="`background-image: url(${item.data.src})`"></div>
+								</template>
+								<template v-else-if="item.type === 'video' ">
+									<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
+								</template>
+								<!-- <template v-else-if="item.type === 'iframe' ">
+									<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
+								</template> -->
+								<template v-else>
+									<div class="grid__item"
+										:style="`background-image: url(https://via.placeholder.com/150?text=${item.data.src})`">
+									</div>
+								</template>
+							</template>
+
+
+
+						</a>
+
+
 					</div>
-				</li>
-			</ul>
-		</div>
-	</aside>
+					<button class="gridback">
+						<svg width="27px" height="15px" viewBox="0 0 27 15">
+							<path
+								d="M1.469 6.75l-.719.719 7.938 6.937.718-.719L1.47 6.75zM8.594.531L.75 7.375l.688.688L9.28 1.218 8.594.53zM1.406 6.938v1h24.75v-1H1.406z"
+								fill="#fffff" />
+						</svg>
+					</button>
+				</div><!-- /grid-wrap -->
+			</div><!-- /page -->
 
-	<main class="uk-width-expand">
-		<!-- <div class="frame">
-			<div class="frame__pagetitle">Draggable Menu with Grid Previews</div>
-			<div class="frame__title-wrap">
-				<h1 class="frame__title">Yuri Shevchenko</h1>
-				<p class="frame__tagline">2008 &mdash; 2019</a></p>
+			<div class="menu-wrap">
+				<div class="menu-draggable"></div>
+				<nav class="menu">
+
+					<div v-for="(chapter, c) in chapters"
+						:class="['menu__item', current === chapter.title ? 'menu__item--current' : '']" :key="c">
+
+						<a class="menu__item-link uk-flex uk-flex-center">{{ chapter.title }}</a>
+						<h4 class="description uk-width-large uk-margin-auto">
+							{{ chapter.description}}
+						</h4>
+
+						<a :href="`#${chapter.title}`" class="menu__item-explore">Press Play</a>
+					</div>
+
+				</nav>
 			</div>
-			<div class="frame__links">
-				<a href="https://tympanus.net/Development/DraggableImageStrip/">Previous Demo</a>
-				<a href="https://tympanus.net/codrops/?p=40926">Article</a>
-				<a href="https://github.com/codrops/DraggableMenu/">GitHub</a>
+		</main>
+
+
+		<div class="cursor">
+			<div class="cursor__inner cursor__inner--circle">
+				<div class="cursor__side cursor__side--left"></div>
+				<div class="cursor__side cursor__side--right"></div>
 			</div>
-			<div class="frame__social">
-				<a href="#" aria-label="Link to Yuri's Behance profile"><img src="img/behance.svg"
-						class="frame__social-behance" alt="Behance Logo" /></a>
-			</div>
-		</div> -->
-
-		<div class="page page--preview">
-			<div class="grid-wrap">
-				<div v-for="(chapter, c) in chapters" :class="`grid grid--layout-${c+1}`" :key="c" :id="c"
-					:key="`flow-${version}`" uk-lightbox>
-
-					<a v-for="(item, i) in chapter.items" :href="`${item.data.src}`" :key="`${c}${i}`"
-						class="grid__item-wrap" :data-alt="item.type">
-
-						<template v-if="item.type !== 'iframe'">
-							<template v-if="item.type === 'image' ">
-								<div class="grid__item" :style="`background-image: url(${item.data.src})`"></div>
-							</template>
-							<template v-else-if="item.type === 'video' ">
-								<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
-							</template>
-							<!-- <template v-else-if="item.type === 'iframe' ">
-								<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
-							</template> -->
-							<template v-else>
-								<div class="grid__item"
-									:style="`background-image: url(https://via.placeholder.com/150?text=${item.data.src})`">
-								</div>
-							</template>
-						</template>
-
-
-
-					</a>
-
-
-				</div>
-				<button class="gridback">
-					<svg width="27px" height="15px" viewBox="0 0 27 15">
-						<path
-							d="M1.469 6.75l-.719.719 7.938 6.937.718-.719L1.47 6.75zM8.594.531L.75 7.375l.688.688L9.28 1.218 8.594.53zM1.406 6.938v1h24.75v-1H1.406z"
-							fill="#fffff" />
-					</svg>
-				</button>
-			</div><!-- /grid-wrap -->
-		</div><!-- /page -->
-
-		<div class="menu-wrap">
-			<div class="menu-draggable"></div>
-			<nav class="menu">
-
-				<div v-for="(chapter, c) in chapters"
-					:class="['menu__item', current === chapter.title ? 'menu__item--current' : '']" :key="c">
-					<a class="menu__item-link uk-flex uk-flex-center">{{ chapter.title }}</a>
-					<h4 class="description uk-width-large uk-margin-auto">
-						{{ chapter.description}}
-					</h4>
-					<a :href="`#${chapter.title}`" class="menu__item-explore">Press Play</a>
-				</div>
-
-
-
 		</div>
-		</nav>
-		</div>
-	</main>
 
-	<div class="cursor">
-		<div class="cursor__inner cursor__inner--circle">
-			<div class="cursor__side cursor__side--left"></div>
-			<div class="cursor__side cursor__side--right"></div>
-		</div>
 	</div>
 
 	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 	<script src="https://unpkg.com/@vueuse/shared"></script>
 	<script src="https://unpkg.com/@vueuse/core"></script>
 	<script src="https://unpkg.com/grapesjs"></script>
-	<script>
+	<script type="module">
 		const { createApp, ref, computed } = Vue
-
 		createApp({
 			setup() {
 
 				const holder = ref('gjs')
+				const title = ref('The Hoodie Unravelled')
 				const pointer = ref(0)
+				const selected = ref(null)
 				const version = ref(0)
 				const chapters = ref([
 					{
@@ -497,7 +674,8 @@
 					const order = Array.from(event.target.children)
 					const items = Array.from(document.getElementsByClassName('menu__item'))
 
-					// window.location.hash = order.find((o, p) => pointer.value === p).innerText
+					window.location.hash = order.find((o, p) => pointer.value === p).innerText
+
 					/* const el = order.find((o, p) => pointer.value === p && o.id != p)
 					if(el) {
 						console.log('hash', el.innerText, window.location.hash.slice(1))
@@ -529,7 +707,9 @@
 
 				// expose to template and other options API hooks
 				return {
+					title,
 					pointer,
+					selected,
 					current,
 					version,
 					chapters,
@@ -537,7 +717,91 @@
 				}
 			},
 			mounted() {
+				this.$nextTick(() => {
+					console.log('w', window.UIkit)
+				})
 				window.addEventListener('popstate', this.setCurrentHash)
+				var bar = document.getElementById('js-progressbar');
+				const { title, chapters, generateNewChapter } = this
+
+				async function getBase64(file) {
+					const myPromise = new Promise((resolve, reject) => {
+						var reader = new FileReader();
+						reader.readAsDataURL(file);
+						reader.onload = function () {
+							resolve(reader.result);
+						};
+						reader.onerror = function (error) {
+							reject(error)
+						};
+					});
+
+					return myPromise
+				}
+
+				function beforeAll() {
+					const files = arguments[1]
+					const newItems = files.map(async file => {
+						const uri = await getBase64(file)
+						return {
+							type: file.type.split('/')[0],
+							data: {
+								img: `${baseUrl}/${file.name.toLowerCase().split(' ').join(':')}`,
+								uri
+							}
+						}
+					})
+					const newChapter = generateNewChapter({ newItems })
+				}
+
+				window.UIkit.upload('.js-upload', {
+
+					// url: 'http://rdwzcfpkxxbixgksgbch.supabase.co/api/v1/object/the-hoodie-unravelled/',
+					multiple: true,
+					beforeAll,
+					/* load: function () {
+						console.log('load', arguments);
+					},
+					error: function () {
+						console.log('error', arguments);
+					}, */
+					complete: function () {
+						console.log('complete', arguments);
+					},
+
+					loadStart: function (e) {
+						console.log('loadStart', arguments);
+
+						bar.removeAttribute('hidden');
+						bar.max = e.total;
+						bar.value = e.loaded;
+					},
+
+					progress: function (e) {
+						console.log('progress', arguments);
+
+						bar.max = e.total;
+						bar.value = e.loaded;
+					},
+
+					/* loadEnd: function (e) {
+						console.log('loadEnd', arguments);
+
+						bar.max = e.total;
+						bar.value = e.loaded;
+					}, */
+
+					completeAll: function () {
+						console.log('completeAll', arguments);
+
+						setTimeout(function () {
+							bar.setAttribute('hidden', 'hidden');
+						}, 1000);
+
+						alert('Upload Completed');
+					}
+
+				});
 			},
 			methods: {
 				setCurrentHash(i) {
@@ -545,11 +809,42 @@
 					const before = this.pointer
 					this.current = window.location.hash.slice(1)
 					this.pointer = this.chapters.findIndex(chapter => chapter.title === this.current)
+				},
+				setCurrentChapter(i) {
+					window.location.hash = i
+				},
+				setCurrentImage({ item, id }) {
+					this.selected = item
+				},
+				updateItem(item) {
+					console.log('ok', item, this.generateNewChapter({
+						items: [item]
+					}))
+					
+					
+				},
+				updateSelected({ selected, text }) {
+					// console.log('el', { selected, text})
+					selected.data.src = text
+				},
+				generateNewChapter({ items }) {
+					const chapterTitle = window.location.hash.split('#')[1]
+					const baseUrl = `http://rdwzcfpkxxbixgksgbch.supabase.co/api/v1/object/${this.title.toLowerCase().split(' ').join(':')}/${chapterTitle.toLowerCase()}`
+					const chapter = this.chapters.find(c => c.title = chapterTitle)
+					let updatedItems 
+
+					if(items) {
+						updatedItems = chapter.items.map( item => chapter.items.findIndex(i => i.data.img = item.img))
+					}
+					
+					// const newItems = [...chapter.items]
+					return updatedItems
 				}
 			}
 		}).mount('#app')
 	</script>
 	<script src="js/uikit.min.js"></script>
+	<script src="js/uikit-icons.min.js"></script>
 	<script src="js/imagesloaded.pkgd.min.js"></script>
 	<script src="js/charming.min.js"></script>
 	<script src="js/TweenMax.min.js"></script>
