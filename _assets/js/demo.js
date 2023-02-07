@@ -655,7 +655,7 @@
             
             // Clicking the explore opens up the grid for the current menu item
             for ( let menuItem of this.menuItems ) {
-                console.log('menuItem', menuItem)
+                // console.log('menuItem', menuItem)
                 menuItem.DOM.explore.addEventListener('click', () => this.showContent());
             }
 

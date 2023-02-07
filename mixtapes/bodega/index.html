@@ -16,8 +16,8 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Seymour+One&display=swap" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="_assets/css/uikit.min.css" />
-	<link rel="stylesheet" type="text/css" href="_assets/css/base.css" />
+	<link rel="stylesheet" type="text/css" href="/_assets/css/uikit.min.css" />
+	<link rel="stylesheet" type="text/css" href="/_assets/css/base.css" />
 	<style>
 		.uk-lightbox {
 			z-index: 10110;
@@ -324,7 +324,6 @@
 			</div>
 		</main>
 
-
 		<div class="cursor">
 			<div class="cursor__inner cursor__inner--circle">
 				<div class="cursor__side cursor__side--left"></div>
@@ -338,8 +337,9 @@
 	<script src="https://unpkg.com/@vueuse/shared"></script>
 	<script src="https://unpkg.com/@vueuse/core"></script>
 	<script src="https://unpkg.com/grapesjs"></script>
+	<script src="/_assets/js/papaparse.min.js"></script>
 	<script type="module">
-		const { createApp, ref, computed } = Vue
+		const { createApp, ref, computed, onMounted } = Vue
 		createApp({
 			setup() {
 
@@ -704,7 +704,45 @@
 					version.value = version.value + 1
 				}
 
+				onMounted(() => {
+					const Papa = window.Papa
+					Papa.parse(`data.csv`, {
+						download: true,
+						header: true,
+						complete: async (list, l) => {
+							const archive = await Promise.all(list.data.map(async chapter => ({
+								...chapter,
+								items: await new Promise((resolve, reject) => {
+									Papa.parse(`chapters/${chapter.title}/index.csv`, {
+										download: true,
+										header: true,
+										complete: (list, l) => {
+											/* function calculateType(type) {
+												if (type) {
+													const newType = type.includes('video') ? 'video' : type.toLowerCase()
+												} else {
+													return null
+												}
+											} */
 
+											const items = list.data.map(item => ({
+												type: item.type ? item.type.toLowerCase() : null,
+												data: {
+													href: item.href || null,
+													src: `chapters/${chapter.title}/items/${item.src}`,
+												}
+											})).filter(i => typeof i.type === 'string' && typeof i.data.href === 'string')
+											resolve(items)
+										},
+										// rest of config ...
+									})
+								})
+							})))
+							console.log('arch', archive)
+							console.log('chap', chapters.value = archive)
+						},
+					})
+				}) 
 				// expose to template and other options API hooks
 				return {
 					title,
@@ -718,9 +756,9 @@
 			},
 			mounted() {
 				this.$nextTick(() => {
-					console.log('w', window.UIkit)
+					// console.log('w', window.UIkit)
 				})
-				window.addEventListener('popstate', this.setCurrentHash)
+				// window.addEventListener('popstate', this.setCurrentHash)
 				var bar = document.getElementById('js-progressbar');
 				const { title, chapters, generateNewChapter } = this
 
@@ -820,8 +858,8 @@
 					console.log('ok', item, this.generateNewChapter({
 						items: [item]
 					}))
-					
-					
+
+
 				},
 				updateSelected({ selected, text }) {
 					// console.log('el', { selected, text})
@@ -831,12 +869,12 @@
 					const chapterTitle = window.location.hash.split('#')[1]
 					const baseUrl = `http://rdwzcfpkxxbixgksgbch.supabase.co/api/v1/object/${this.title.toLowerCase().split(' ').join(':')}/${chapterTitle.toLowerCase()}`
 					const chapter = this.chapters.find(c => c.title = chapterTitle)
-					let updatedItems 
+					let updatedItems
 
-					if(items) {
-						updatedItems = chapter.items.map( item => chapter.items.findIndex(i => i.data.img = item.img))
+					if (items) {
+						updatedItems = chapter.items.map(item => chapter.items.findIndex(i => i.data.img = item.img))
 					}
-					
+
 					// const newItems = [...chapter.items]
 					return updatedItems
 				}
