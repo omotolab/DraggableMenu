@@ -10,25 +10,29 @@
     <link rel="stylesheet" type="text/css" href="/_assets/css/base.css" />
 </head>
 
-<body class="uk-background-secondary">
-    <main class="uk-section uk-height-viewport uk-flex uk-flex-middle">
-        <header class="uk-container ">
-            <figure class="uk-list uk-list-small uk-flex uk-flex-column uk-flex-center uk-flex-middle uk-width-small uk-margin-auto">
+<body class="uk-background-secondary uk-height-viewport ">
+    <main class="uk-flex uk-flex-column uk-flex-middle uk-flex-center" uk-height-viewport="offset-bottom: true">
+        <header class="uk-section uk-section-large uk-width-1-1">
+            <figure
+                class="uk-list uk-list-small uk-flex uk-flex-column uk-flex-center uk-flex-middle uk-width-small uk-margin-auto">
                 <img src="/_assets/img/logo.png" alt="Concrete Blossom logo" class="uk-height-auto ">
-                <figcaption class="uk-light">
+                <!-- <figcaption class="uk-light">
                     <ul class="uk-iconnav uk-flex uk-flex-middle">
                         <li><span class="uk-text-meta uk-width-small">Preview Version:</span></li>
                         <li>
-                            <strong class="uk-icon-button uk-badge uk-text-small uk-position-button-right uk-border-rounded uk-visible@s">
+                            <strong
+                                class="uk-icon-button uk-badge uk-text-small uk-position-button-right uk-border-rounded uk-visible@s">
                                 beta
                             </strong>
                         </li>
-                        
+
                     </ul>
-                </figcaption>
+                </figcaption> -->
             </figure>
 
         </header>
+        
+
         <!--  <article >
             <div class="uk-card-default">
                 <h1>Concrete Beta</h1>
@@ -40,6 +44,60 @@
             </div>
         </article> -->
     </main>
+    <nav class="uk-container uk-width-1-1">
+        <header class="uk-container-small uk-margin-auto">
+            <div class="uk-width-xlarge uk-margin-auto">
+                <ul class="uk-list">
+                    <li>
+                        <div class="uk-width-medium uk-margin-auto">
+                            <a href="mixtapes">
+                                <div class="uk-card-primary uk-card-small uk-border-rounded">
+                                    <div class="uk-card-body uk-padding-remove-vertical">
+                                        <div class="uk-card-body uk-height-small uk-padding-remove-horizontal">
+                                            Mixtapes
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </li>
+                </ul>
+            </div>
+
+        </header>
+        <footer class="uk-container-small uk-margin-auto">
+            <div class="uk-card-footer uk-padding-remove-horizontal">
+                <ul class="uk-list uk-light uk-width-medium uk-margin-auto">
+                    <li class="uk-flex uk-flex-middle uk-flex-center">
+
+                        <ul class="uk-list uk-iconnav uk-flex uk-flex-middle">
+
+                            <!-- <li><button class="uk-icon-button uk-button-default uk-border-rounded">
+                                <span uk-icon="grid"></span>
+                            </button></li> -->
+
+                            <li>
+                                <span>&copy; Concrete Blossom</span>
+                                <span>
+                                    <a class="uk-inline" href="https://coordinature.com" target="_blank">& Co</a>
+                                </span>
+                                </span>
+                            </li>
+                    </li>
+                </ul>
+                </li>
+
+                </ul>
+            </div>
+
+        </footer>
+    </nav>
+
+    <script src="/_assets/js/uikit.min.js"></script>
+    <script src="/_assets/js/uikit-icons.min.js"></script>
+    <script type="module" src="https://unpkg.com/vivagraphjs@0.12.0/src/viva.js"></script>
 </body>
 
 </html>
