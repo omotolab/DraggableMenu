@@ -273,11 +273,11 @@
 							class="grid__item-wrap" :data-alt="item.type">
 
 							<template v-if="item.type !== 'iframe'">
-								<template v-if="item.type === 'image' ">
+								<template v-if="item.type.toLowerCase() === 'image' ">
 									<div class="grid__item" :style="`background-image: url(${item.data.src})`"></div>
 								</template>
-								<template v-else-if="item.type === 'video' ">
-									<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
+								<template v-else-if="item.type.includes('video') === 'video' ">
+									<div class="grid__item" :style="`background-image: url(${item.data.src})`"></div>
 								</template>
 								<!-- <template v-else-if="item.type === 'iframe' ">
 									<div class="grid__item" :style="`background-image: url(${item.data.img})`"></div>
